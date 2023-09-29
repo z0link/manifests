@@ -50,13 +50,13 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
-    - ""
+      - ""
     resources:
-    - nodes/metrics
+      - nodes/metrics
     verbs:
-    - get
+      - get
   - apiGroups:
-    - ""
+      - ""
     resources:
       - pods
       - nodes
@@ -177,7 +177,7 @@ spec:
         app.kubernetes.io/name: metrics-server
         app.kubernetes.io/instance: metrics-server
     spec:
-      schedulerName: 
+      schedulerName:
       serviceAccountName: metrics-server
       securityContext:
         runAsGroup: 1000
@@ -190,7 +190,7 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop:
-              - ALL
+                - ALL
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 1000
@@ -203,11 +203,12 @@ spec:
             - --cert-dir=/tmp
             - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
             - --kubelet-use-node-status-port
+            - --kubelet-insecure-tls
             - --metric-resolution=15s
           ports:
-          - name: https
-            protocol: TCP
-            containerPort: 4443
+            - name: https
+              protocol: TCP
+              containerPort: 4443
           livenessProbe:
             failureThreshold: 3
             httpGet:
