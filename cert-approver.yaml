@@ -7,7 +7,7 @@ metadata:
     pod-security.kubernetes.io/audit: restricted
     pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/warn: restricted
-  name: cert-manager
+  name: kubelet-serving-cert-approver
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -16,7 +16,7 @@ metadata:
     app.kubernetes.io/instance: kubelet-serving-cert-approver
     app.kubernetes.io/name: kubelet-serving-cert-approver
   name: kubelet-serving-cert-approver
-  namespace: cert-manager
+  namespace: kubelet-serving-cert-approver
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -25,7 +25,7 @@ metadata:
     app.kubernetes.io/instance: kubelet-serving-cert-approver
     app.kubernetes.io/name: kubelet-serving-cert-approver
   name: leader-election:kubelet-serving-cert-approver
-  namespace: cert-manager
+  namespace: kubelet-serving-cert-approver
 rules:
   - apiGroups:
       - ""
@@ -111,7 +111,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: kubelet-serving-cert-approver
-    namespace: cert-manager
+    namespace: kubelet-serving-cert-approver
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -120,7 +120,7 @@ metadata:
     app.kubernetes.io/instance: kubelet-serving-cert-approver
     app.kubernetes.io/name: kubelet-serving-cert-approver
   name: leader-election:kubelet-serving-cert-approver
-  namespace: cert-manager
+  namespace: kubelet-serving-cert-approver
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -128,7 +128,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: kubelet-serving-cert-approver
-    namespace: cert-manager
+    namespace: kubelet-serving-cert-approver
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -144,7 +144,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: kubelet-serving-cert-approver
-    namespace: cert-manager
+    namespace: kubelet-serving-cert-approver
 ---
 apiVersion: v1
 kind: Service
@@ -153,7 +153,7 @@ metadata:
     app.kubernetes.io/instance: kubelet-serving-cert-approver
     app.kubernetes.io/name: kubelet-serving-cert-approver
   name: kubelet-serving-cert-approver
-  namespace: cert-manager
+  namespace: kubelet-serving-cert-approver
 spec:
   ports:
     - name: metrics
@@ -171,7 +171,7 @@ metadata:
     app.kubernetes.io/instance: kubelet-serving-cert-approver
     app.kubernetes.io/name: kubelet-serving-cert-approver
   name: kubelet-serving-cert-approver
-  namespace: cert-manager
+  namespace: kubelet-serving-cert-approver
 spec:
   replicas: 2
   selector:
