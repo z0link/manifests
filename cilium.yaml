@@ -42,8 +42,6 @@ ipv4NativeRoutingCIDR: 10.110.0.0/24
 autoDirectNodeRoutes: true
 bgpControlPlane:
   enabled: true
-monitor:
-  enabled: true
 
 bpf:
   masquerade: true
