@@ -29,6 +29,9 @@ securityContext:
       - ALL
   readOnlyRootFilesystem: true
 
+args:
+  - --kubelet-insecure-tls
+
 nodeSelector:
   node-role.kubernetes.io/control-plane: ""
 tolerations:
