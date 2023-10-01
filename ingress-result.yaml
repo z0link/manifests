@@ -42,7 +42,7 @@ data:
   http-redirect-code: "301"
   limit-req-status-code: "429"
   log-format-escape-json: "true"
-  log-format-upstream: '{"ip":"$remote_addr", "ssl":"$ssl_protocol", "method":"$request_method", "proto":"$scheme", "host":"$host", "uri":"$request_uri", "status":$status, "size":$bytes_sent, "agent":"$http_user_agent", "referer":"$http_referer", "namespace":"$namespace"}'
+  log-format-upstream: "{\"ip\":\"$remote_addr\", \"ssl\":\"$ssl_protocol\", \"method\":\"$request_method\", \"proto\":\"$scheme\", \"host\":\"$host\", \"uri\":\"$request_uri\", \"status\":$status, \"size\":$bytes_sent, \"agent\":\"$http_user_agent\", \"referer\":\"$http_referer\", \"namespace\":\"$namespace\"}"
   proxy-connect-timeout: "10"
   proxy-headers-hash-bucket-size: "128"
   proxy-hide-headers: "strict-transport-security"
@@ -300,7 +300,8 @@ metadata:
 spec:
   type: ClusterIP
   clusterIP: None
-  ipFamilies:
+  ipFamilyPolicy: SingleStack
+  ipFamilies: 
     - IPv4
   ports:
     - name: http
@@ -339,7 +340,7 @@ spec:
       app.kubernetes.io/instance: ingress-nginx
       app.kubernetes.io/component: controller
   revisionHistoryLimit: 2
-  updateStrategy:
+  updateStrategy: 
     rollingUpdate:
       maxUnavailable: 1
     type: RollingUpdate
@@ -363,11 +364,11 @@ spec:
         - name: controller
           image: "registry.k8s.io/ingress-nginx/controller:v1.8.0@sha256:744ae2afd433a395eeb13dc03d3313facba92e96ad71d9feaafc85925493fee3"
           imagePullPolicy: IfNotPresent
-          lifecycle:
+          lifecycle: 
             preStop:
               exec:
                 command:
-                  - /wait-shutdown
+                - /wait-shutdown
           args:
             - /nginx-ingress-controller
             - --election-id=ingress-nginx-leader
@@ -377,12 +378,12 @@ spec:
             - --enable-topology-aware-routing=true
             - --post-shutdown-grace-period=30
             - --report-node-internal-ip-address=true
-          securityContext:
+          securityContext: 
             capabilities:
               drop:
-                - ALL
+              - ALL
               add:
-                - NET_BIND_SERVICE
+              - NET_BIND_SERVICE
             runAsUser: 101
             allowPrivilegeEscalation: true
           env:
@@ -400,7 +401,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          livenessProbe:
+          livenessProbe: 
             failureThreshold: 5
             httpGet:
               path: /healthz
@@ -410,7 +411,7 @@ spec:
             periodSeconds: 30
             successThreshold: 1
             timeoutSeconds: 1
-          readinessProbe:
+          readinessProbe: 
             failureThreshold: 3
             httpGet:
               path: /healthz
@@ -427,7 +428,7 @@ spec:
             - name: https
               containerPort: 443
               protocol: TCP
-          resources:
+          resources: 
             limits:
               cpu: 1
               memory: 1Gi
@@ -435,17 +436,17 @@ spec:
               cpu: 100m
               memory: 128Mi
       hostNetwork: true
-      nodeSelector:
+      nodeSelector: 
         kubernetes.io/os: linux
-      affinity:
+      affinity: 
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-              - matchExpressions:
-                  - key: project.io/node-pool
-                    operator: In
-                    values:
-                      - web
+            - matchExpressions:
+              - key: project.io/node-pool
+                operator: In
+                values:
+                - controlplane
       serviceAccountName: ingress-nginx
       terminationGracePeriodSeconds: 300
 ---

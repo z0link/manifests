@@ -98,7 +98,7 @@ controller:
               - key: project.io/node-pool
                 operator: In
                 values:
-                  - web
+                  - controlplane
 
   service:
     enabled: true
