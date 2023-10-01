@@ -165,8 +165,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
-  strategy:
-    type: RollingUpdate
   selector:
     matchLabels:
       app.kubernetes.io/name: metrics-server
@@ -225,22 +223,12 @@ spec:
             - name: tmp
               mountPath: /tmp
           resources:
-            limits:
-              cpu: 100m
-              memory: 128Mi
             requests:
-              cpu: 50m
-              memory: 64Mi
+              cpu: 100m
+              memory: 200Mi
       volumes:
         - name: tmp
           emptyDir: {}
-      nodeSelector:
-        node-role.kubernetes.io/control-plane: ""
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-        - effect: NoSchedule
-          key: node.kubernetes.io/not-ready
 ---
 # Source: metrics-server/templates/apiservice.yaml
 apiVersion: apiregistration.k8s.io/v1

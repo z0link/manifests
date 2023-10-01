@@ -1,13 +1,13 @@
-updateStrategy:
-  type: RollingUpdate
-
-resources:
-  limits:
-    cpu: 100m
-    memory: 128Mi
-  requests:
-    cpu: 50m
-    memory: 64Mi
+#updateStrategy:
+#  type: RollingUpdate
+#
+#resources:
+#  limits:
+#    cpu: 100m
+#    memory: 128Mi
+#  requests:
+#    cpu: 50m
+#    memory: 64Mi
 
 #livenessProbe:
 #  periodSeconds: 30
@@ -31,11 +31,11 @@ resources:
 
 args:
   - --kubelet-insecure-tls
-
-nodeSelector:
-  node-role.kubernetes.io/control-plane: ""
-tolerations:
-  - key: node-role.kubernetes.io/control-plane
-    effect: NoSchedule
-  - key: node.kubernetes.io/not-ready
-    effect: NoSchedule
+#
+#nodeSelector:
+#  node-role.kubernetes.io/control-plane: ""
+#tolerations:
+#  - key: node-role.kubernetes.io/control-plane
+#    effect: NoSchedule
+#  - key: node.kubernetes.io/not-ready
+#    effect: NoSchedule
