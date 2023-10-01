@@ -179,10 +179,6 @@ spec:
     spec:
       schedulerName: 
       serviceAccountName: metrics-server
-      securityContext:
-        runAsGroup: 1000
-        runAsNonRoot: true
-        runAsUser: 1000
       priorityClassName: "system-cluster-critical"
       containers:
         - name: metrics-server
@@ -216,7 +212,7 @@ spec:
               port: https
               scheme: HTTPS
             initialDelaySeconds: 0
-            periodSeconds: 30
+            periodSeconds: 10
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -224,7 +220,7 @@ spec:
               port: https
               scheme: HTTPS
             initialDelaySeconds: 20
-            periodSeconds: 30
+            periodSeconds: 10
           volumeMounts:
             - name: tmp
               mountPath: /tmp
