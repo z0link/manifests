@@ -1,41 +1,41 @@
-#updateStrategy:
-#  type: RollingUpdate
-#
-#resources:
-#  limits:
-#    cpu: 100m
-#    memory: 128Mi
-#  requests:
-#    cpu: 50m
-#    memory: 64Mi
+updateStrategy:
+  type: RollingUpdate
 
-#livenessProbe:
-#  periodSeconds: 30
-#
-#readinessProbe:
-#  periodSeconds: 30
-#
-#podSecurityContext:
-#  runAsNonRoot: true
-#  runAsUser: 1000
-#  runAsGroup: 1000
-#
-#securityContext:
-#  allowPrivilegeEscalation: false
-#  seccompProfile:
-#    type: RuntimeDefault
-#  capabilities:
-#    drop:
-#      - ALL
-#  readOnlyRootFilesystem: true
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+livenessProbe:
+  periodSeconds: 30
+
+readinessProbe:
+  periodSeconds: 30
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
 
 args:
   - --kubelet-insecure-tls
-#
-#nodeSelector:
-#  node-role.kubernetes.io/control-plane: ""
-#tolerations:
-#  - key: node-role.kubernetes.io/control-plane
-#    effect: NoSchedule
-#  - key: node.kubernetes.io/not-ready
-#    effect: NoSchedule
+
+nodeSelector:
+  node-role.kubernetes.io/control-plane: ""
+tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    effect: NoSchedule
+  - key: node.kubernetes.io/not-ready
+    effect: NoSchedule

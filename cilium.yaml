@@ -22,7 +22,7 @@ localRedirectPolicy: true
 tunnel: "disabled"
 devices: [eth+]
 
-healthChecking: true
+healthChecking: false
 
 cni:
   install: true

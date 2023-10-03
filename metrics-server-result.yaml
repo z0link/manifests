@@ -165,6 +165,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
   selector:
     matchLabels:
       app.kubernetes.io/name: metrics-server
@@ -177,6 +179,10 @@ spec:
     spec:
       schedulerName: 
       serviceAccountName: metrics-server
+      securityContext:
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
       priorityClassName: "system-cluster-critical"
       containers:
         - name: metrics-server
@@ -210,7 +216,7 @@ spec:
               port: https
               scheme: HTTPS
             initialDelaySeconds: 0
-            periodSeconds: 10
+            periodSeconds: 30
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -218,17 +224,27 @@ spec:
               port: https
               scheme: HTTPS
             initialDelaySeconds: 20
-            periodSeconds: 10
+            periodSeconds: 30
           volumeMounts:
             - name: tmp
               mountPath: /tmp
           resources:
-            requests:
+            limits:
               cpu: 100m
-              memory: 200Mi
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
       volumes:
         - name: tmp
           emptyDir: {}
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+        - effect: NoSchedule
+          key: node.kubernetes.io/not-ready
 ---
 # Source: metrics-server/templates/apiservice.yaml
 apiVersion: apiregistration.k8s.io/v1
