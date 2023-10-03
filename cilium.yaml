@@ -14,13 +14,9 @@ operator:
     - operator: Exists
       effect: NoSchedule
 
-identityAllocationMode: crd
 kubeProxyReplacement: strict
-enableK8sEndpointSlice: true
-localRedirectPolicy: true
 
 tunnel: "disabled"
-devices: [eth+]
 
 healthChecking: false
 
@@ -31,7 +27,6 @@ ipam:
   mode: "kubernetes"
 k8s:
   requireIPv4PodCIDR: true
-  requireIPv6PodCIDR: false
 
 loadBalancer:
   mode: dsr
@@ -55,8 +50,6 @@ nodePort:
   enabled: true
 externalIPs:
   enabled: true
-hostFirewall:
-  enabled: true
 ingressController:
   enabled: false
 
@@ -79,7 +72,7 @@ securityContext:
 cgroup:
   autoMount:
     enabled: false
-  hostRoot: /sys/fs/cgroup
+  hostRoot: /sys/fs/cgroup2
 
 resources:
   limits:
