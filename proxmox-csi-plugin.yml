@@ -13,10 +13,7 @@ tolerations:
     effect: NoSchedule
 
 storageClass:
-  - name: proxmox-data-xfs
+  - name: proxmox-zraid
     storage: zraid
     reclaimPolicy: Delete
-    fstype: xfs
-  - name: proxmox-data
-    storage: zraid
-    reclaimPolicy: Delete
+    fstype: ext4
