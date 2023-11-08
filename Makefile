@@ -17,3 +17,6 @@ create-deployments: ## create templates
 
 	helm template --namespace=ingress-nginx --version=4.7.0 -f ./ingress.yaml ingress-nginx \
 		ingress-nginx/ingress-nginx > ./ingress-result.yaml
+
+	helm template --namespace=csi-proxmox -f ./proxmox-csi-plugin.yml proxmox-csi-plugin \
+		./proxmox-csi-plugin-0.1.12.tgz > ./proxmox-csi-plugin-talos.yml
