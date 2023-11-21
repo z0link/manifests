@@ -2,6 +2,12 @@
 k8sServiceHost: "api.zerolab.link"
 k8sServicePort: "6443"
 
+hubble:
+  ui:
+    enabled: true
+  relay:
+    enabled: true
+
 operator:
   enabled: true
   rollOutPods: true

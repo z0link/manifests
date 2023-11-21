@@ -1,11 +1,10 @@
-
 image:
   repository: rancher/local-path-provisioner
   tag: v0.0.24
 
 storageClass:
   create: true
-  defaultClass: true
+  defaultClass: false
   provisionerName: rancher.io/local-path
 
 nodePathMap:
