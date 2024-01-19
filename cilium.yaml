@@ -10,6 +10,9 @@ hubble:
   tls:
     enabled: false
 
+l2NeighDiscovery:
+  enabled: false
+
 operator:
   enabled: true
   rollOutPods: true

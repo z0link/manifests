@@ -160,7 +160,7 @@ data:
   enable-auto-protect-node-port-range: "true"
   bpf-lb-mode: "dsr"
   enable-svc-source-range-check: "true"
-  enable-l2-neigh-discovery: "true"
+  enable-l2-neigh-discovery: "false"
   arping-refresh-period: "30s"
   k8s-require-ipv4-pod-cidr: "true"
   enable-k8s-networkpolicy: "true"
@@ -202,6 +202,8 @@ data:
   set-cilium-node-taints: "true"
   set-cilium-is-up-condition: "true"
   unmanaged-pod-watcher-interval: "15"
+  # default DNS proxy to transparent mode in non-chaining modes
+  dnsproxy-enable-transparent-mode: "true"
   tofqdns-dns-reject-response-code: "refused"
   tofqdns-enable-dns-compression: "true"
   tofqdns-endpoint-max-ip-per-hostname: "50"
@@ -786,7 +788,7 @@ spec:
     spec:
       containers:
       - name: cilium-agent
-        image: "quay.io/cilium/cilium:v1.14.4@sha256:4981767b787c69126e190e33aee93d5a076639083c21f0e7c29596a519c64a2e"
+        image: "quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-agent
@@ -867,10 +869,10 @@ spec:
                     # dependencies on anything that is part of the startup script
                     # itself, and can be safely run multiple times per node (e.g. in
                     # case of a restart).
-                    if [[ "$(iptables-save | grep -c 'AWS-SNAT-CHAIN|AWS-CONNMARK-CHAIN')" != "0" ]];
+                    if [[ "$(iptables-save | grep -E -c 'AWS-SNAT-CHAIN|AWS-CONNMARK-CHAIN')" != "0" ]];
                     then
                         echo 'Deleting iptables rules created by the AWS CNI VPC plugin'
-                        iptables-save | grep -v 'AWS-SNAT-CHAIN|AWS-CONNMARK-CHAIN' | iptables-restore
+                        iptables-save | grep -E -v 'AWS-SNAT-CHAIN|AWS-CONNMARK-CHAIN' | iptables-restore
                     fi
                     echo 'Done!'
                     
@@ -909,7 +911,7 @@ spec:
           mountPath: /tmp
       initContainers:
       - name: config
-        image: "quay.io/cilium/cilium:v1.14.4@sha256:4981767b787c69126e190e33aee93d5a076639083c21f0e7c29596a519c64a2e"
+        image: "quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a"
         imagePullPolicy: IfNotPresent
         command:
         - cilium
@@ -936,7 +938,7 @@ spec:
       # Required to mount cgroup2 filesystem on the underlying Kubernetes node.
       # We use nsenter command with host's cgroup and mount namespaces enabled.
       - name: mount-cgroup
-        image: "quay.io/cilium/cilium:v1.14.4@sha256:4981767b787c69126e190e33aee93d5a076639083c21f0e7c29596a519c64a2e"
+        image: "quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a"
         imagePullPolicy: IfNotPresent
         env:
         - name: CGROUP_ROOT
@@ -964,7 +966,7 @@ spec:
         securityContext:
           privileged: true
       - name: apply-sysctl-overwrites
-        image: "quay.io/cilium/cilium:v1.14.4@sha256:4981767b787c69126e190e33aee93d5a076639083c21f0e7c29596a519c64a2e"
+        image: "quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a"
         imagePullPolicy: IfNotPresent
         env:
         - name: BIN_PATH
@@ -990,7 +992,7 @@ spec:
         securityContext:
           privileged: true
       - name: clean-cilium-state
-        image: "quay.io/cilium/cilium:v1.14.4@sha256:4981767b787c69126e190e33aee93d5a076639083c21f0e7c29596a519c64a2e"
+        image: "quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a"
         imagePullPolicy: IfNotPresent
         command:
         - /init-container.sh
@@ -1022,14 +1024,10 @@ spec:
           mountPath: /run/cilium/cgroupv2
           mountPropagation: HostToContainer
         - name: cilium-run
-          mountPath: /var/run/cilium
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi # wait-for-kube-proxy
+          mountPath: /var/run/cilium # wait-for-kube-proxy
       # Install the CNI binaries in an InitContainer so we don't have a writable host mount in the agent
       - name: install-cni-binaries
-        image: "quay.io/cilium/cilium:v1.14.4@sha256:4981767b787c69126e190e33aee93d5a076639083c21f0e7c29596a519c64a2e"
+        image: "quay.io/cilium/cilium:v1.14.6@sha256:37a49f1abb333279a9b802ee8a21c61cde9dd9138b5ac55f77bdfca733ba852a"
         imagePullPolicy: IfNotPresent
         command:
           - "/install-plugin.sh"
@@ -1163,7 +1161,7 @@ spec:
     metadata:
       annotations:
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "58c9fa64bcaf165390a7973172b7e6e77ade2026014e9602928bb19113da07b7"
+        cilium.io/cilium-configmap-checksum: "d68baa7e47b0f58a19214e7f4cfc99b0afc642bee31f66788cbdf13afa7ffe4a"
       labels:
         io.cilium/app: operator
         name: cilium-operator
@@ -1172,7 +1170,7 @@ spec:
     spec:
       containers:
       - name: cilium-operator
-        image: "quay.io/cilium/operator-generic:v1.14.4@sha256:f0f05e4ba3bb1fe0e4b91144fa4fea637701aba02e6c00b23bd03b4a7e1dfd55"
+        image: "quay.io/cilium/operator-generic:v1.14.6@sha256:2f0bf8fb8362c7379f3bf95036b90ad5b67378ed05cd8eb0410c1afc13423848"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-operator-generic
@@ -1289,7 +1287,7 @@ spec:
             runAsGroup: 65532
             runAsNonRoot: true
             runAsUser: 65532
-          image: "quay.io/cilium/hubble-relay:v1.14.4@sha256:ca81622fd9f04c1316bf4144bde5dbce613758810f6022f6c706b14c9c0815db"
+          image: "quay.io/cilium/hubble-relay:v1.14.6@sha256:adeb90adae481bb952211483f511afee40825707953ed7ac118902d3bc8dd37f"
           imagePullPolicy: IfNotPresent
           command:
             - hubble-relay
