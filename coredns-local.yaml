@@ -111,6 +111,10 @@ spec:
       - effect: NoSchedule
         key: node.cloudprovider.kubernetes.io/uninitialized
         operator: Exists
+      - key: k8s.zerolab.dev/location
+        operator: Equal
+        value: public
+        effect: NoSchedule
       hostNetwork: true
       containers:
       - name: coredns
