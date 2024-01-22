@@ -33,6 +33,7 @@ spec:
             - "--enable-cni=false"
             - "--enable-ibgp=true"
             - "--enable-overlay=true"
+            - "--peer-router-multihop-ttl=3"
             - "--peer-router-ips=10.110.0.254"
             - "--peer-router-asns=64880"
             - "--cluster-asn=64881"
@@ -87,7 +88,7 @@ metadata:
   namespace: kube-system
 rules:
   - apiGroups:
-    - ""
+      - ""
     resources:
       - namespaces
       - pods
@@ -99,7 +100,7 @@ rules:
       - get
       - watch
   - apiGroups:
-    - "networking.k8s.io"
+      - "networking.k8s.io"
     resources:
       - networkpolicies
     verbs:
@@ -107,7 +108,7 @@ rules:
       - get
       - watch
   - apiGroups:
-    - extensions
+      - extensions
     resources:
       - networkpolicies
     verbs:
@@ -146,6 +147,6 @@ roleRef:
   kind: ClusterRole
   name: kube-router
 subjects:
-- kind: ServiceAccount
-  name: kube-router
-  namespace: kube-system
+  - kind: ServiceAccount
+    name: kube-router
+    namespace: kube-system
