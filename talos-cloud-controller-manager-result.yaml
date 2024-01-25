@@ -13,7 +13,7 @@ metadata:
   namespace: kube-system
 ---
 # Source: talos-cloud-controller-manager/templates/serviceaccount.yaml
-apiVersion: talos.dev/v1alpha1
+apiVersion: talos.dev/v1alpha2
 kind: ServiceAccount
 metadata:
   name: talos-cloud-controller-manager-talos-secrets
