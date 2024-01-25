@@ -33,7 +33,7 @@ spec:
             - "--enable-cni=false"
             - "--enable-ibgp=true"
             - "--enable-overlay=true"
-            - "--peer-router-multihop-ttl=3"
+            - "--peer-router-multihop-ttl=10"
             - "--peer-router-ips=10.110.0.254"
             - "--peer-router-asns=64880"
             - "--cluster-asn=64881"
