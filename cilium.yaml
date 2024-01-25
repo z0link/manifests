@@ -38,7 +38,7 @@ k8s:
 loadBalancer:
   mode: dsr
 enableIPv4Masquerade: true
-ipv4NativeRoutingCIDR: 10.0.0.0/8
+ipv4NativeRoutingCIDR: 10.120.0.0/14
 autoDirectNodeRoutes: true
 bgpControlPlane:
   enabled: true
@@ -62,19 +62,6 @@ ingressController:
 
 securityContext:
   privileged: true
-
-#hubble:
-#  relay:
-#    enabled: true
-#  enabled: true
-#  ui:
-#    enabled: true
-#  metrics:
-#    dashboards:
-#      enabled: true
-#
-#prometheus:
-#  enabled: true
 
 resources:
   limits:
