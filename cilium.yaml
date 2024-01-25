@@ -38,7 +38,7 @@ k8s:
 loadBalancer:
   mode: dsr
 enableIPv4Masquerade: true
-ipv4NativeRoutingCIDR: 10.120.0.0/14
+ipv4NativeRoutingCIDR: 10.0.0.0/8
 autoDirectNodeRoutes: true
 bgpControlPlane:
   enabled: true
