@@ -27,7 +27,7 @@ operator:
 
 kubeProxyReplacement: strict
 tunnel: "disabled"
-healthChecking: false
+healthChecking: true
 cni:
   install: true
 ipam:
@@ -39,7 +39,7 @@ loadBalancer:
   mode: dsr
 enableIPv4Masquerade: true
 ipv4NativeRoutingCIDR: 10.120.0.0/14
-autoDirectNodeRoutes: true
+autoDirectNodeRoutes: false
 bgpControlPlane:
   enabled: true
 
