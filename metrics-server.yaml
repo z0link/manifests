@@ -39,3 +39,5 @@ tolerations:
     effect: NoSchedule
   - key: node.kubernetes.io/not-ready
     effect: NoSchedule
+  - key: node.cloudprovider.kubernetes.io/uninitialized
+    effect: NoSchedule
