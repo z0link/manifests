@@ -33,7 +33,7 @@ spec:
             - "--enable-cni=false"
             - "--enable-ibgp=true"
             - "--enable-overlay=true"
-            - "--nodes-full-mesh=false"
+            - "--nodes-full-mesh=true"
             - "--override-nexthop=true"
             - "--peer-router-multihop-ttl=5"
             - "--peer-router-ips=10.110.0.254"
