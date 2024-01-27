@@ -34,13 +34,14 @@ spec:
             - "--enable-ibgp=true"
             - "--enable-overlay=true"
             - "--nodes-full-mesh=false"
-            - "--peer-router-multihop-ttl=10"
-            #  - "--peer-router-ips=10.110.0.254"
-            #  - "--peer-router-asns=64880"
-            #  - "--cluster-asn=64881"
+            - "--override-nexthop=true"
+            - "--peer-router-multihop-ttl=5"
+            - "--peer-router-ips=10.110.0.254"
+            - "--peer-router-asns=64880"
+            - "--cluster-asn=64882"
             - "--advertise-cluster-ip=true"
             - "--advertise-external-ip=true"
-            - "--advertise-loadbalancer-ip=true"
+            - "--advertise-loadbalancer-ip=false"
           env:
             - name: NODE_NAME
               valueFrom:
