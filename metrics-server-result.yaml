@@ -164,7 +164,7 @@ metadata:
     app.kubernetes.io/version: "0.6.4"
     app.kubernetes.io/managed-by: Helm
 spec:
-  replicas: 1
+  replicas: 2
   strategy:
     type: RollingUpdate
   selector:

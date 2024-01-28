@@ -9,6 +9,8 @@ resources:
     cpu: 50m
     memory: 64Mi
 
+replicas: 2
+
 livenessProbe:
   periodSeconds: 30
 
