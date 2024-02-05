@@ -42,7 +42,7 @@ spec:
             - "--peer-router-asns=64880"
             - "--cluster-asn=64881"
             - "--advertise-cluster-ip=false"
-            - "--advertise-external-ip=true"
+            - "--advertise-external-ip=false"
             - "--advertise-loadbalancer-ip=true"
           env:
             - name: NODE_NAME
