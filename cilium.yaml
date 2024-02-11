@@ -27,6 +27,7 @@ operator:
 
 kubeProxyReplacement: strict
 tunnel: "disabled"
+routingMode: native
 healthChecking: true
 cni:
   install: true
@@ -59,6 +60,8 @@ externalIPs:
   enabled: true
 ingressController:
   enabled: false
+gatewayAPI:
+  enabled: true
 
 securityContext:
   privileged: true
