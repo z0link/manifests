@@ -959,7 +959,7 @@ spec:
     spec:
       containers:
       - name: cilium-agent
-        image: "quay.io/cilium/cilium:v1.15.0@sha256:9cfd6a0a3a964780e73a11159f93cc363e616f7d9783608f62af6cfdf3759619"
+        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-agent
@@ -1021,6 +1021,7 @@ spec:
           valueFrom:
             resourceFieldRef:
               resource: limits.memory
+              divisor: '1'
         - name: KUBERNETES_SERVICE_HOST
           value: "api.zerolab.link"
         - name: KUBERNETES_SERVICE_PORT
@@ -1087,7 +1088,7 @@ spec:
           mountPath: /tmp
       initContainers:
       - name: config
-        image: "quay.io/cilium/cilium:v1.15.0@sha256:9cfd6a0a3a964780e73a11159f93cc363e616f7d9783608f62af6cfdf3759619"
+        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-dbg
@@ -1114,7 +1115,7 @@ spec:
       # Required to mount cgroup2 filesystem on the underlying Kubernetes node.
       # We use nsenter command with host's cgroup and mount namespaces enabled.
       - name: mount-cgroup
-        image: "quay.io/cilium/cilium:v1.15.0@sha256:9cfd6a0a3a964780e73a11159f93cc363e616f7d9783608f62af6cfdf3759619"
+        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
         imagePullPolicy: IfNotPresent
         env:
         - name: CGROUP_ROOT
@@ -1142,7 +1143,7 @@ spec:
         securityContext:
           privileged: true
       - name: apply-sysctl-overwrites
-        image: "quay.io/cilium/cilium:v1.15.0@sha256:9cfd6a0a3a964780e73a11159f93cc363e616f7d9783608f62af6cfdf3759619"
+        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
         imagePullPolicy: IfNotPresent
         env:
         - name: BIN_PATH
@@ -1168,7 +1169,7 @@ spec:
         securityContext:
           privileged: true
       - name: clean-cilium-state
-        image: "quay.io/cilium/cilium:v1.15.0@sha256:9cfd6a0a3a964780e73a11159f93cc363e616f7d9783608f62af6cfdf3759619"
+        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
         imagePullPolicy: IfNotPresent
         command:
         - /init-container.sh
@@ -1209,7 +1210,7 @@ spec:
           mountPath: /var/run/cilium # wait-for-kube-proxy
       # Install the CNI binaries in an InitContainer so we don't have a writable host mount in the agent
       - name: install-cni-binaries
-        image: "quay.io/cilium/cilium:v1.15.0@sha256:9cfd6a0a3a964780e73a11159f93cc363e616f7d9783608f62af6cfdf3759619"
+        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
         imagePullPolicy: IfNotPresent
         command:
           - "/install-plugin.sh"
@@ -1352,7 +1353,7 @@ spec:
     spec:
       containers:
       - name: cilium-operator
-        image: "quay.io/cilium/operator-generic:v1.15.0@sha256:e26ecd316e742e4c8aa1e302ba8b577c2d37d114583d6c4cdd2b638493546a79"
+        image: "quay.io/cilium/operator-generic:v1.15.3@sha256:c97f23161906b82f5c81a2d825b0646a5aa1dfb4adf1d49cbb87815079e69d61"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-operator-generic
@@ -1469,7 +1470,7 @@ spec:
             runAsGroup: 65532
             runAsNonRoot: true
             runAsUser: 65532
-          image: "quay.io/cilium/hubble-relay:v1.15.0@sha256:45b3ea70b73aee01644f800b8f6138c36446bfb130d2b88b0f75775ebe6a9ab6"
+          image: "quay.io/cilium/hubble-relay:v1.15.3@sha256:b9c6431aa4f22242a5d0d750c621d9d04bdc25549e4fb1116bfec98dd87958a2"
           imagePullPolicy: IfNotPresent
           command:
             - hubble-relay
@@ -1554,7 +1555,7 @@ spec:
       automountServiceAccountToken: true
       containers:
       - name: frontend
-        image: "quay.io/cilium/hubble-ui:v0.12.3@sha256:e6b825302fc1e406b1305363fe0bcd1fdf95730b32c2b99a2b36dfa37bdaeec2"
+        image: "quay.io/cilium/hubble-ui:v0.13.0@sha256:7d663dc16538dd6e29061abd1047013a645e6e69c115e008bee9ea9fef9a6666"
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
@@ -1575,7 +1576,7 @@ spec:
           mountPath: /tmp
         terminationMessagePolicy: FallbackToLogsOnError
       - name: backend
-        image: "quay.io/cilium/hubble-ui-backend:v0.12.3@sha256:1cd84251cec46e20f9e839ee0afba9b51c8de59d35681234f701d7f42062f138"
+        image: "quay.io/cilium/hubble-ui-backend:v0.13.0@sha256:1e7657d997c5a48253bb8dc91ecee75b63018d16ff5e5797e5af367336bc8803"
         imagePullPolicy: IfNotPresent
         env:
         - name: EVENTS_SERVER_PORT
