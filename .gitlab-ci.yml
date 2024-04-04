@@ -1,0 +1,22 @@
+stages:
+  - push_to_github
+
+push_changes:
+  image: ${HARBOR_HOST}/docker/alpine/git:latest
+  stage: push_to_github
+  only:
+    - main
+  script:
+    - git checkout -b main || git branch -f main
+    - git config --global user.email "${GITHUB_EMAIL}"
+    - git config --global user.name "${GITHUB_USER}"
+    - git remote add github https://${GITHUB_TOKEN}@github.com/${GITHUB_REMOTE}.git || true
+    - git push github HEAD:main --force
+  after_script:
+    - git remote remove github || true
+    - echo "Maschine ${CI_COMMIT_SHA}"
+  environment:
+    name: push_to_github
+  variables:
+    GIT_STRATEGY: fetch
+
