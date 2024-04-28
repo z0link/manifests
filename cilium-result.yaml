@@ -110,7 +110,7 @@ data:
   # bpf-lb-map-max specifies the maximum number of entries in bpf lb service,
   # backend and affinity maps.
   bpf-lb-map-max: "65536"
-  bpf-lb-external-clusterip: "false"
+  bpf-lb-external-clusterip: "true"
 
   # Pre-allocation of map entries allows per-packet latency to be reduced, at
   # the expense of up-front memory allocation for the entries in the maps. The
@@ -155,7 +155,6 @@ data:
   enable-ipv4-big-tcp: "false"
   enable-ipv6-big-tcp: "false"
   enable-ipv6-masquerade: "true"
-  enable-bpf-masquerade: "true"
   enable-masquerade-to-route-source: "false"
 
   enable-xt-socket-fallback: "true"
@@ -959,7 +958,7 @@ spec:
     spec:
       containers:
       - name: cilium-agent
-        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
+        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-agent
@@ -1023,7 +1022,7 @@ spec:
               resource: limits.memory
               divisor: '1'
         - name: KUBERNETES_SERVICE_HOST
-          value: "api.zerolab.link"
+          value: "10.110.0.250"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         lifecycle:
@@ -1088,7 +1087,7 @@ spec:
           mountPath: /tmp
       initContainers:
       - name: config
-        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
+        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-dbg
@@ -1105,7 +1104,7 @@ spec:
               apiVersion: v1
               fieldPath: metadata.namespace
         - name: KUBERNETES_SERVICE_HOST
-          value: "api.zerolab.link"
+          value: "10.110.0.250"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         volumeMounts:
@@ -1115,7 +1114,7 @@ spec:
       # Required to mount cgroup2 filesystem on the underlying Kubernetes node.
       # We use nsenter command with host's cgroup and mount namespaces enabled.
       - name: mount-cgroup
-        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
+        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
         imagePullPolicy: IfNotPresent
         env:
         - name: CGROUP_ROOT
@@ -1143,7 +1142,7 @@ spec:
         securityContext:
           privileged: true
       - name: apply-sysctl-overwrites
-        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
+        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
         imagePullPolicy: IfNotPresent
         env:
         - name: BIN_PATH
@@ -1169,7 +1168,7 @@ spec:
         securityContext:
           privileged: true
       - name: clean-cilium-state
-        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
+        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
         imagePullPolicy: IfNotPresent
         command:
         - /init-container.sh
@@ -1193,7 +1192,7 @@ spec:
               key: write-cni-conf-when-ready
               optional: true
         - name: KUBERNETES_SERVICE_HOST
-          value: "api.zerolab.link"
+          value: "10.110.0.250"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         terminationMessagePolicy: FallbackToLogsOnError
@@ -1210,7 +1209,7 @@ spec:
           mountPath: /var/run/cilium # wait-for-kube-proxy
       # Install the CNI binaries in an InitContainer so we don't have a writable host mount in the agent
       - name: install-cni-binaries
-        image: "quay.io/cilium/cilium:v1.15.3@sha256:da74ab61d1bc665c1c088dff41d5be388d252ca5800f30c7d88844e6b5e440b0"
+        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
         imagePullPolicy: IfNotPresent
         command:
           - "/install-plugin.sh"
@@ -1344,7 +1343,7 @@ spec:
     metadata:
       annotations:
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "18f103a0e0845edd3e1788d5b4bb45755ecaac4cc23e671dc57b485214b6251f"
+        cilium.io/cilium-configmap-checksum: "e89d589a740aef725b8f5eb037d5afddaaf0c61af783b1d1ec4eded7a7ddb07d"
       labels:
         io.cilium/app: operator
         name: cilium-operator
@@ -1353,7 +1352,7 @@ spec:
     spec:
       containers:
       - name: cilium-operator
-        image: "quay.io/cilium/operator-generic:v1.15.3@sha256:c97f23161906b82f5c81a2d825b0646a5aa1dfb4adf1d49cbb87815079e69d61"
+        image: "quay.io/cilium/operator-generic:v1.15.4@sha256:404890a83cca3f28829eb7e54c1564bb6904708cdb7be04ebe69c2b60f164e9a"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-operator-generic
@@ -1378,7 +1377,7 @@ spec:
               name: cilium-config
               optional: true
         - name: KUBERNETES_SERVICE_HOST
-          value: "api.zerolab.link"
+          value: "10.110.0.250"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         livenessProbe:
@@ -1470,7 +1469,7 @@ spec:
             runAsGroup: 65532
             runAsNonRoot: true
             runAsUser: 65532
-          image: "quay.io/cilium/hubble-relay:v1.15.3@sha256:b9c6431aa4f22242a5d0d750c621d9d04bdc25549e4fb1116bfec98dd87958a2"
+          image: "quay.io/cilium/hubble-relay:v1.15.4@sha256:03ad857feaf52f1b4774c29614f42a50b370680eb7d0bfbc1ae065df84b1070a"
           imagePullPolicy: IfNotPresent
           command:
             - hubble-relay
