@@ -4,9 +4,9 @@ k8sServicePort: "6443"
 
 hubble:
   ui:
-    enabled: true
+    enabled: false
   relay:
-    enabled: true
+    enabled: false
   tls:
     enabled: false
 
@@ -34,8 +34,6 @@ ipam:
 k8s:
   requireIPv4PodCIDR: true
 
-loadBalancer:
-  mode: dsr
 bgpControlPlane:
   enabled: true
 
