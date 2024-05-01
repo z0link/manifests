@@ -26,8 +26,6 @@ operator:
       effect: NoSchedule
 
 kubeProxyReplacement: strict
-tunnel: "disabled"
-routingMode: native
 healthChecking: true
 cni:
   install: true
@@ -38,11 +36,8 @@ k8s:
 
 loadBalancer:
   mode: dsr
-enableIPv4Masquerade: true
-ipv4NativeRoutingCIDR: ""
-autoDirectNodeRoutes: false
 bgpControlPlane:
-  enabled: false
+  enabled: true
 
 bpf:
   lbExternalClusterIP: true

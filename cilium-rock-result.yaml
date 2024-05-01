@@ -144,7 +144,9 @@ data:
   #   - disabled
   #   - vxlan (default)
   #   - geneve
-  routing-mode: "native"
+  # Default case
+  routing-mode: "tunnel"
+  tunnel-protocol: "vxlan"
   service-no-backend-response: "reject"
 
 
@@ -204,7 +206,8 @@ data:
   vtep-cidr: ""
   vtep-mask: ""
   vtep-mac: ""
-  enable-bgp-control-plane: "false"
+  enable-bgp-control-plane: "true"
+  bgp-secrets-namespace: "kube-system"
   bpf-root: "/sys/fs/bpf"
   cgroup-root: "/run/cilium/cgroupv2"
   enable-k8s-terminating-endpoint: "true"
@@ -765,6 +768,24 @@ rules:
   - list
   - watch
 ---
+# Source: cilium/templates/cilium-agent/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cilium-bgp-control-plane-secrets
+  namespace: "kube-system"
+  labels:
+    app.kubernetes.io/part-of: cilium
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+---
 # Source: cilium/templates/cilium-operator/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -813,6 +834,23 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: cilium-gateway-secrets
+subjects:
+- kind: ServiceAccount
+  name: "cilium"
+  namespace: kube-system
+---
+# Source: cilium/templates/cilium-agent/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cilium-bgp-control-plane-secrets
+  namespace: "kube-system"
+  labels:
+    app.kubernetes.io/part-of: cilium
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cilium-bgp-control-plane-secrets
 subjects:
 - kind: ServiceAccount
   name: "cilium"
@@ -1306,7 +1344,7 @@ spec:
     metadata:
       annotations:
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "27df419d3e36bf57e35da750546202eaaf00d2cca1b94af69ef96ea814dd309c"
+        cilium.io/cilium-configmap-checksum: "0670026567f73deb5fbd0d1e31a7ddd690fbdf8af980c11f724701221f67b051"
       labels:
         io.cilium/app: operator
         name: cilium-operator
