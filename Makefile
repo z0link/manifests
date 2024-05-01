@@ -12,6 +12,9 @@ create-deployments: ## create templates
 	helm template --namespace=kube-system  -f ./cilium.yaml cilium \
 		cilium/cilium > ./cilium-result.yaml
 
+	helm template --namespace=kube-system  -f ./cilium-rock.yaml cilium \
+		cilium/cilium > ./cilium-rock-result.yaml
+
 	helm template --namespace=kube-system -f ./metrics-server.yaml metrics-server \
 		metrics-server/metrics-server > ./metrics-server-result.yaml
 
