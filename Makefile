@@ -6,6 +6,8 @@ helm-repos: ## add helm repos
 	helm repo add cilium               https://helm.cilium.io
 	helm repo add metrics-server       https://kubernetes-sigs.github.io/metrics-server/
 	helm repo add ingress-nginx        https://kubernetes.github.io/ingress-nginx
+	helm repo add proxmox-csi          oci://ghcr.io/sergelogvinov/charts/proxmox-csi-plugin/
+	helm repo add rook-release         https://charts.rook.io/release
 	helm repo update
 
 create-deployments: ## create templates
@@ -23,3 +25,6 @@ create-deployments: ## create templates
 
 	helm template --namespace=csi-proxmox -f ./proxmox-csi-plugin.yml proxmox-csi-plugin \
 		./proxmox-csi-plugin-0.1.12.tgz > ./proxmox-csi-plugin-talos.yml
+
+	helm template --namespace=rook-ceph -f ./rook-ceph-values.yaml rook-ceph \
+		rook-release/rook-ceph > ./rook-ceph-result.yaml

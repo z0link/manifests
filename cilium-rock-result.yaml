@@ -219,9 +219,12 @@ data:
   mesh-auth-rotated-identities-queue-size: "1024"
   mesh-auth-gc-interval: "5m0s"
 
+  proxy-xff-num-trusted-hops-ingress: "0"
+  proxy-xff-num-trusted-hops-egress: "0"
   proxy-connect-timeout: "2"
   proxy-max-requests-per-connection: "0"
   proxy-max-connection-duration-seconds: "0"
+  proxy-idle-timeout-seconds: "60"
 
   external-envoy-proxy: "false"
   max-connected-clusters: "255"
@@ -815,7 +818,7 @@ spec:
     spec:
       containers:
       - name: cilium-agent
-        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
+        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-agent
@@ -944,7 +947,7 @@ spec:
           mountPath: /tmp
       initContainers:
       - name: config
-        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
+        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-dbg
@@ -971,7 +974,7 @@ spec:
       # Required to mount cgroup2 filesystem on the underlying Kubernetes node.
       # We use nsenter command with host's cgroup and mount namespaces enabled.
       - name: mount-cgroup
-        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
+        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
         imagePullPolicy: IfNotPresent
         env:
         - name: CGROUP_ROOT
@@ -999,7 +1002,7 @@ spec:
         securityContext:
           privileged: true
       - name: apply-sysctl-overwrites
-        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
+        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
         imagePullPolicy: IfNotPresent
         env:
         - name: BIN_PATH
@@ -1025,7 +1028,7 @@ spec:
         securityContext:
           privileged: true
       - name: clean-cilium-state
-        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
+        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
         imagePullPolicy: IfNotPresent
         command:
         - /init-container.sh
@@ -1066,7 +1069,7 @@ spec:
           mountPath: /var/run/cilium # wait-for-kube-proxy
       # Install the CNI binaries in an InitContainer so we don't have a writable host mount in the agent
       - name: install-cni-binaries
-        image: "quay.io/cilium/cilium:v1.15.4@sha256:b760a4831f5aab71c711f7537a107b751d0d0ce90dd32d8b358df3c5da385426"
+        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
         imagePullPolicy: IfNotPresent
         command:
           - "/install-plugin.sh"
@@ -1200,7 +1203,7 @@ spec:
     metadata:
       annotations:
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "80e2a18a3a29d87fdee55e411f933b4690804be6e2e5cdca8f04798144d2942f"
+        cilium.io/cilium-configmap-checksum: "255d0f99d6ba357fbc53308866e3a5b478246f6279ba1b1bd686d78c533d5cde"
       labels:
         io.cilium/app: operator
         name: cilium-operator
@@ -1209,7 +1212,7 @@ spec:
     spec:
       containers:
       - name: cilium-operator
-        image: "quay.io/cilium/operator-generic:v1.15.4@sha256:404890a83cca3f28829eb7e54c1564bb6904708cdb7be04ebe69c2b60f164e9a"
+        image: "quay.io/cilium/operator-generic:v1.15.5@sha256:f5d3d19754074ca052be6aac5d1ffb1de1eb5f2d947222b5f10f6d97ad4383e8"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-operator-generic
