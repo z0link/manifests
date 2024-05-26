@@ -9,7 +9,7 @@ resources:
     cpu: 50m
     memory: 64Mi
 
-replicas: 2
+replicas: 3
 
 livenessProbe:
   periodSeconds: 30
@@ -34,8 +34,17 @@ securityContext:
 args:
   - --kubelet-insecure-tls
 
-nodeSelector:
-  node-role.kubernetes.io/control-plane: ""
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: k8s.zerolab.dev/role
+              operator: In
+              values:
+                - ingress
+                - master
+
 tolerations:
   - key: node-role.kubernetes.io/control-plane
     effect: NoSchedule
@@ -44,3 +53,6 @@ tolerations:
   - key: node.cloudprovider.kubernetes.io/uninitialized
     value: "true"
     effect: NoSchedule
+  - key: k8s.zerolab.dev/location
+    operator: Equal
+    value: public

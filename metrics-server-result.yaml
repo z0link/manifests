@@ -164,7 +164,7 @@ metadata:
     app.kubernetes.io/version: "0.7.1"
     app.kubernetes.io/managed-by: Helm
 spec:
-  replicas: 2
+  replicas: 3
   strategy:
     type: RollingUpdate
   selector:
@@ -238,8 +238,16 @@ spec:
       volumes:
         - name: tmp
           emptyDir: {}
-      nodeSelector:
-        node-role.kubernetes.io/control-plane: ""
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: k8s.zerolab.dev/role
+                operator: In
+                values:
+                - ingress
+                - master
       tolerations:
         - effect: NoSchedule
           key: node-role.kubernetes.io/control-plane
@@ -248,6 +256,9 @@ spec:
         - effect: NoSchedule
           key: node.cloudprovider.kubernetes.io/uninitialized
           value: "true"
+        - key: k8s.zerolab.dev/location
+          operator: Equal
+          value: public
 ---
 # Source: metrics-server/templates/apiservice.yaml
 apiVersion: apiregistration.k8s.io/v1
