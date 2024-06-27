@@ -20,6 +20,9 @@ create-deployments: ## create templates
 	helm template --namespace=kube-system -f ./metrics-server.yaml metrics-server \
 		metrics-server/metrics-server > ./metrics-server-result.yaml
 
+	helm template --namespace=kube-system -f ./metrics-server-generic.yaml metrics-server \
+		metrics-server/metrics-server > ./metrics-server-generic-result.yaml
+
 	helm template --namespace=ingress-nginx --version=4.7.0 -f ./ingress.yaml ingress-nginx \
 		ingress-nginx/ingress-nginx > ./ingress-result.yaml
 

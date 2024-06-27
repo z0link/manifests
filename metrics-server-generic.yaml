@@ -9,7 +9,7 @@ resources:
     cpu: 50m
     memory: 64Mi
 
-replicas: 3
+replicas: 1
 
 livenessProbe:
   periodSeconds: 30
@@ -33,7 +33,6 @@ securityContext:
 
 args:
   - --kubelet-insecure-tls
-
 
 tolerations:
   - key: node-role.kubernetes.io/control-plane
