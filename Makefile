@@ -11,7 +11,7 @@ helm-repos: ## add helm repos
 	helm repo update
 
 create-deployments: ## create templates
-	helm template --namespace=kube-system  -f ./cilium.yaml cilium \
+	helm template --namespace=kube-system  --version=1.15 -f ./cilium.yaml cilium \
 		cilium/cilium > ./cilium-result.yaml
 
 	helm template --namespace=kube-system  -f ./cilium-rock.yaml cilium \

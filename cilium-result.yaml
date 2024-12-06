@@ -220,6 +220,7 @@ data:
   unmanaged-pod-watcher-interval: "15"
   # default DNS proxy to transparent mode in non-chaining modes
   dnsproxy-enable-transparent-mode: "true"
+  dnsproxy-socket-linger-timeout: "10"
   tofqdns-dns-reject-response-code: "refused"
   tofqdns-enable-dns-compression: "true"
   tofqdns-endpoint-max-ip-per-hostname: "50"
@@ -961,7 +962,7 @@ spec:
     spec:
       containers:
       - name: cilium-agent
-        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
+        image: "quay.io/cilium/cilium:v1.15.11@sha256:4444c963c586dd29c9219f4f984b87b7d6f7ee5c0ce650b442111a6ab602b00f"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-agent
@@ -1025,7 +1026,7 @@ spec:
               resource: limits.memory
               divisor: '1'
         - name: KUBERNETES_SERVICE_HOST
-          value: "10.110.0.250"
+          value: "10.99.0.44"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         lifecycle:
@@ -1090,7 +1091,7 @@ spec:
           mountPath: /tmp
       initContainers:
       - name: config
-        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
+        image: "quay.io/cilium/cilium:v1.15.11@sha256:4444c963c586dd29c9219f4f984b87b7d6f7ee5c0ce650b442111a6ab602b00f"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-dbg
@@ -1107,7 +1108,7 @@ spec:
               apiVersion: v1
               fieldPath: metadata.namespace
         - name: KUBERNETES_SERVICE_HOST
-          value: "10.110.0.250"
+          value: "10.99.0.44"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         volumeMounts:
@@ -1117,7 +1118,7 @@ spec:
       # Required to mount cgroup2 filesystem on the underlying Kubernetes node.
       # We use nsenter command with host's cgroup and mount namespaces enabled.
       - name: mount-cgroup
-        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
+        image: "quay.io/cilium/cilium:v1.15.11@sha256:4444c963c586dd29c9219f4f984b87b7d6f7ee5c0ce650b442111a6ab602b00f"
         imagePullPolicy: IfNotPresent
         env:
         - name: CGROUP_ROOT
@@ -1145,7 +1146,7 @@ spec:
         securityContext:
           privileged: true
       - name: apply-sysctl-overwrites
-        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
+        image: "quay.io/cilium/cilium:v1.15.11@sha256:4444c963c586dd29c9219f4f984b87b7d6f7ee5c0ce650b442111a6ab602b00f"
         imagePullPolicy: IfNotPresent
         env:
         - name: BIN_PATH
@@ -1171,7 +1172,7 @@ spec:
         securityContext:
           privileged: true
       - name: clean-cilium-state
-        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
+        image: "quay.io/cilium/cilium:v1.15.11@sha256:4444c963c586dd29c9219f4f984b87b7d6f7ee5c0ce650b442111a6ab602b00f"
         imagePullPolicy: IfNotPresent
         command:
         - /init-container.sh
@@ -1195,7 +1196,7 @@ spec:
               key: write-cni-conf-when-ready
               optional: true
         - name: KUBERNETES_SERVICE_HOST
-          value: "10.110.0.250"
+          value: "10.99.0.44"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         terminationMessagePolicy: FallbackToLogsOnError
@@ -1212,7 +1213,7 @@ spec:
           mountPath: /var/run/cilium # wait-for-kube-proxy
       # Install the CNI binaries in an InitContainer so we don't have a writable host mount in the agent
       - name: install-cni-binaries
-        image: "quay.io/cilium/cilium:v1.15.5@sha256:4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
+        image: "quay.io/cilium/cilium:v1.15.11@sha256:4444c963c586dd29c9219f4f984b87b7d6f7ee5c0ce650b442111a6ab602b00f"
         imagePullPolicy: IfNotPresent
         command:
           - "/install-plugin.sh"
@@ -1231,7 +1232,6 @@ spec:
             mountPath: /host/opt/cni/bin # .Values.cni.install
       restartPolicy: Always
       priorityClassName: system-node-critical
-      serviceAccount: "cilium"
       serviceAccountName: "cilium"
       automountServiceAccountToken: true
       terminationGracePeriodSeconds: 1
@@ -1261,7 +1261,7 @@ spec:
         hostPath:
           path: /sys/fs/bpf
           type: DirectoryOrCreate
-      # To mount cgroup2 filesystem on the host
+      # To mount cgroup2 filesystem on the host or apply sysctlfix
       - name: hostproc
         hostPath:
           path: /proc
@@ -1346,7 +1346,7 @@ spec:
     metadata:
       annotations:
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "18e52a34194924c0716d47f7d2679ef2a240314e042434dc91eb74b031d6d0be"
+        cilium.io/cilium-configmap-checksum: "f86d4a100167a841a48cdac85e57075c1d407efb9c0a07760da3b8b2ddcd1a16"
       labels:
         io.cilium/app: operator
         name: cilium-operator
@@ -1355,7 +1355,7 @@ spec:
     spec:
       containers:
       - name: cilium-operator
-        image: "quay.io/cilium/operator-generic:v1.15.5@sha256:f5d3d19754074ca052be6aac5d1ffb1de1eb5f2d947222b5f10f6d97ad4383e8"
+        image: "quay.io/cilium/operator-generic:v1.15.11@sha256:8edf16ce4bc5c02457136cf0e7a58adf396f0880d6192ca0666f116f53f4979d"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-operator-generic
@@ -1380,7 +1380,7 @@ spec:
               name: cilium-config
               optional: true
         - name: KUBERNETES_SERVICE_HOST
-          value: "10.110.0.250"
+          value: "10.99.0.44"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         livenessProbe:
@@ -1410,7 +1410,6 @@ spec:
       hostNetwork: true
       restartPolicy: Always
       priorityClassName: system-cluster-critical
-      serviceAccount: "cilium-operator"
       serviceAccountName: "cilium-operator"
       automountServiceAccountToken: true
       # In HA mode, cilium-operator pods must not be scheduled on the same
@@ -1472,7 +1471,7 @@ spec:
             runAsGroup: 65532
             runAsNonRoot: true
             runAsUser: 65532
-          image: "quay.io/cilium/hubble-relay:v1.15.5@sha256:1d24b24e3477ccf9b5ad081827db635419c136a2bd84a3e60f37b26a38dd0781"
+          image: "quay.io/cilium/hubble-relay:v1.15.11@sha256:d352d3860707e8d734a0b185ff69e30b3ffd630a7ec06ba6a4402bed64b4456c"
           imagePullPolicy: IfNotPresent
           command:
             - hubble-relay
@@ -1485,16 +1484,33 @@ spec:
             grpc:
               port: 4222
             timeoutSeconds: 3
+          # livenessProbe will kill the pod, we should be very conservative
+          # here on failures since killing the pod should be a last resort, and
+          # we should provide enough time for relay to retry before killing it.
           livenessProbe:
             grpc:
               port: 4222
-            timeoutSeconds: 3
+            timeoutSeconds: 10
+            # Give relay time to establish connections and make a few retries
+            # before starting livenessProbes.
+            initialDelaySeconds: 10
+            # 10 second * 12 failures = 2 minutes of failure.
+            # If relay cannot become healthy after 2 minutes, then killing it
+            # might resolve whatever issue is occurring.
+            #
+            # 10 seconds is a reasonable retry period so we can see if it's
+            # failing regularly or only sporadically.
+            periodSeconds: 10
+            failureThreshold: 12
           startupProbe:
-            # give the relay one minute to start up
             grpc:
               port: 4222
-            timeoutSeconds: 3
+            # Give relay time to get it's certs and establish connections and
+            # make a few retries before starting startupProbes.
+            initialDelaySeconds: 10
+            # 20 * 3 seconds = 1 minute of failure before we consider startup as failed.
             failureThreshold: 20
+            # Retry more frequently at startup so that it can be considered started more quickly.
             periodSeconds: 3
           volumeMounts:
           - name: config
@@ -1503,7 +1519,6 @@ spec:
           terminationMessagePolicy: FallbackToLogsOnError
       restartPolicy: Always
       priorityClassName: 
-      serviceAccount: "hubble-relay"
       serviceAccountName: "hubble-relay"
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 1
@@ -1551,13 +1566,16 @@ spec:
         app.kubernetes.io/name: hubble-ui
         app.kubernetes.io/part-of: cilium
     spec:
+      securityContext:
+        fsGroup: 1001
+        runAsGroup: 1001
+        runAsUser: 1001
       priorityClassName: 
-      serviceAccount: "hubble-ui"
       serviceAccountName: "hubble-ui"
       automountServiceAccountToken: true
       containers:
       - name: frontend
-        image: "quay.io/cilium/hubble-ui:v0.13.0@sha256:7d663dc16538dd6e29061abd1047013a645e6e69c115e008bee9ea9fef9a6666"
+        image: "quay.io/cilium/hubble-ui:v0.13.1@sha256:e2e9313eb7caf64b0061d9da0efbdad59c6c461f6ca1752768942bfeda0796c6"
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
@@ -1578,7 +1596,7 @@ spec:
           mountPath: /tmp
         terminationMessagePolicy: FallbackToLogsOnError
       - name: backend
-        image: "quay.io/cilium/hubble-ui-backend:v0.13.0@sha256:1e7657d997c5a48253bb8dc91ecee75b63018d16ff5e5797e5af367336bc8803"
+        image: "quay.io/cilium/hubble-ui-backend:v0.13.1@sha256:0e0eed917653441fded4e7cdb096b7be6a3bddded5a2dd10812a27b1fc6ed95b"
         imagePullPolicy: IfNotPresent
         env:
         - name: EVENTS_SERVER_PORT
