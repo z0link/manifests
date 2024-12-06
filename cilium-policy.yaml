@@ -30,7 +30,7 @@ metadata:
 spec:
   nodeSelector:
     matchLabels:
-      topology.kubernetes.io/zone: de-central
+      topology.kubernetes.io/region: oracle
   virtualRouters:
   - localASN: 64882
     exportPodCIDR: true
