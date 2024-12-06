@@ -6,7 +6,6 @@ helm-repos: ## add helm repos
 	helm repo add cilium               https://helm.cilium.io
 	helm repo add metrics-server       https://kubernetes-sigs.github.io/metrics-server/
 	helm repo add ingress-nginx        https://kubernetes.github.io/ingress-nginx
-	helm repo add proxmox-csi          oci://ghcr.io/sergelogvinov/charts/proxmox-csi-plugin/
 	helm repo add rook-release         https://charts.rook.io/release
 	helm repo update
 
