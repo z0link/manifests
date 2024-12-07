@@ -1026,7 +1026,7 @@ spec:
               resource: limits.memory
               divisor: '1'
         - name: KUBERNETES_SERVICE_HOST
-          value: "10.99.0.44"
+          value: "api.zerolab.link"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         lifecycle:
@@ -1108,7 +1108,7 @@ spec:
               apiVersion: v1
               fieldPath: metadata.namespace
         - name: KUBERNETES_SERVICE_HOST
-          value: "10.99.0.44"
+          value: "api.zerolab.link"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         volumeMounts:
@@ -1196,7 +1196,7 @@ spec:
               key: write-cni-conf-when-ready
               optional: true
         - name: KUBERNETES_SERVICE_HOST
-          value: "10.99.0.44"
+          value: "api.zerolab.link"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         terminationMessagePolicy: FallbackToLogsOnError
@@ -1380,7 +1380,7 @@ spec:
               name: cilium-config
               optional: true
         - name: KUBERNETES_SERVICE_HOST
-          value: "10.99.0.44"
+          value: "api.zerolab.link"
         - name: KUBERNETES_SERVICE_PORT
           value: "6443"
         livenessProbe:
