@@ -25,7 +25,7 @@ operator:
     - operator: Exists
       effect: NoSchedule
 
-kubeProxyReplacement: strict
+kubeProxyReplacement: true
 healthChecking: true
 cni:
   install: true
