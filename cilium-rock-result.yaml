@@ -12,13 +12,6 @@ metadata:
   name: "cilium"
   namespace: kube-system
 ---
-# Source: cilium/templates/cilium-envoy/serviceaccount.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: "cilium-envoy"
-  namespace: kube-system
----
 # Source: cilium/templates/cilium-operator/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -58,6 +51,9 @@ data:
   # https://docs.cilium.io/en/latest/security/policy/intro/#policy-enforcement-modes
   enable-policy: "default"
   policy-cidr-match-mode: ""
+  # Port to expose Envoy metrics (e.g. "9964"). Envoy metrics listener will be disabled if this
+  # field is not set.
+  proxy-prometheus-port: "9964"
   enable-envoy-config: "true"
   envoy-config-retry-interval: "15s"
   enable-gateway-api: "true"
@@ -246,7 +242,7 @@ data:
   proxy-max-connection-duration-seconds: "0"
   proxy-idle-timeout-seconds: "60"
 
-  external-envoy-proxy: "true"
+  external-envoy-proxy: "false"
   envoy-base-id: "0"
 
   envoy-keep-cap-netbindservice: "false"
@@ -259,333 +255,6 @@ data:
 
 # Extra config allows adding arbitrary properties to the cilium config.
 # By putting it at the end of the ConfigMap, it's also possible to override existing properties.
----
-# Source: cilium/templates/cilium-envoy/configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cilium-envoy-config
-  namespace: kube-system
-data:
-  bootstrap-config.json: |
-    {
-      "node": {
-        "id": "host~127.0.0.1~no-id~localdomain",
-        "cluster": "ingress-cluster"
-      },
-      "staticResources": {
-        "listeners": [
-          {
-            "name": "envoy-prometheus-metrics-listener",
-            "address": {
-              "socket_address": {
-                "address": "0.0.0.0",
-                "port_value": 9964
-              }
-            },
-            "filter_chains": [
-              {
-                "filters": [
-                  {
-                    "name": "envoy.filters.network.http_connection_manager",
-                    "typed_config": {
-                      "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager",
-                      "stat_prefix": "envoy-prometheus-metrics-listener",
-                      "route_config": {
-                        "virtual_hosts": [
-                          {
-                            "name": "prometheus_metrics_route",
-                            "domains": [
-                              "*"
-                            ],
-                            "routes": [
-                              {
-                                "name": "prometheus_metrics_route",
-                                "match": {
-                                  "prefix": "/metrics"
-                                },
-                                "route": {
-                                  "cluster": "/envoy-admin",
-                                  "prefix_rewrite": "/stats/prometheus"
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      "http_filters": [
-                        {
-                          "name": "envoy.filters.http.router",
-                          "typed_config": {
-                            "@type": "type.googleapis.com/envoy.extensions.filters.http.router.v3.Router"
-                          }
-                        }
-                      ],
-                      "stream_idle_timeout": "0s"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "name": "envoy-health-listener",
-            "address": {
-              "socket_address": {
-                "address": "127.0.0.1",
-                "port_value": 9878
-              }
-            },
-            "filter_chains": [
-              {
-                "filters": [
-                  {
-                    "name": "envoy.filters.network.http_connection_manager",
-                    "typed_config": {
-                      "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager",
-                      "stat_prefix": "envoy-health-listener",
-                      "route_config": {
-                        "virtual_hosts": [
-                          {
-                            "name": "health",
-                            "domains": [
-                              "*"
-                            ],
-                            "routes": [
-                              {
-                                "name": "health",
-                                "match": {
-                                  "prefix": "/healthz"
-                                },
-                                "route": {
-                                  "cluster": "/envoy-admin",
-                                  "prefix_rewrite": "/ready"
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      "http_filters": [
-                        {
-                          "name": "envoy.filters.http.router",
-                          "typed_config": {
-                            "@type": "type.googleapis.com/envoy.extensions.filters.http.router.v3.Router"
-                          }
-                        }
-                      ],
-                      "stream_idle_timeout": "0s"
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "clusters": [
-          {
-            "name": "ingress-cluster",
-            "type": "ORIGINAL_DST",
-            "connectTimeout": "2s",
-            "lbPolicy": "CLUSTER_PROVIDED",
-            "typedExtensionProtocolOptions": {
-              "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
-                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
-                "commonHttpProtocolOptions": {
-                  "idleTimeout": "60s",
-                  "maxConnectionDuration": "0s",
-                  "maxRequestsPerConnection": 0
-                },
-                "useDownstreamProtocolConfig": {}
-              }
-            },
-            "cleanupInterval": "2.500s"
-          },
-          {
-            "name": "egress-cluster-tls",
-            "type": "ORIGINAL_DST",
-            "connectTimeout": "2s",
-            "lbPolicy": "CLUSTER_PROVIDED",
-            "typedExtensionProtocolOptions": {
-              "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
-                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
-                "commonHttpProtocolOptions": {
-                  "idleTimeout": "60s",
-                  "maxConnectionDuration": "0s",
-                  "maxRequestsPerConnection": 0
-                },
-                "upstreamHttpProtocolOptions": {},
-                "useDownstreamProtocolConfig": {}
-              }
-            },
-            "cleanupInterval": "2.500s",
-            "transportSocket": {
-              "name": "cilium.tls_wrapper",
-              "typedConfig": {
-                "@type": "type.googleapis.com/cilium.UpstreamTlsWrapperContext"
-              }
-            }
-          },
-          {
-            "name": "egress-cluster",
-            "type": "ORIGINAL_DST",
-            "connectTimeout": "2s",
-            "lbPolicy": "CLUSTER_PROVIDED",
-            "typedExtensionProtocolOptions": {
-              "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
-                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
-                "commonHttpProtocolOptions": {
-                  "idleTimeout": "60s",
-                  "maxConnectionDuration": "0s",
-                  "maxRequestsPerConnection": 0
-                },
-                "useDownstreamProtocolConfig": {}
-              }
-            },
-            "cleanupInterval": "2.500s"
-          },
-          {
-            "name": "ingress-cluster-tls",
-            "type": "ORIGINAL_DST",
-            "connectTimeout": "2s",
-            "lbPolicy": "CLUSTER_PROVIDED",
-            "typedExtensionProtocolOptions": {
-              "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
-                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
-                "commonHttpProtocolOptions": {
-                  "idleTimeout": "60s",
-                  "maxConnectionDuration": "0s",
-                  "maxRequestsPerConnection": 0
-                },
-                "upstreamHttpProtocolOptions": {},
-                "useDownstreamProtocolConfig": {}
-              }
-            },
-            "cleanupInterval": "2.500s",
-            "transportSocket": {
-              "name": "cilium.tls_wrapper",
-              "typedConfig": {
-                "@type": "type.googleapis.com/cilium.UpstreamTlsWrapperContext"
-              }
-            }
-          },
-          {
-            "name": "xds-grpc-cilium",
-            "type": "STATIC",
-            "connectTimeout": "2s",
-            "loadAssignment": {
-              "clusterName": "xds-grpc-cilium",
-              "endpoints": [
-                {
-                  "lbEndpoints": [
-                    {
-                      "endpoint": {
-                        "address": {
-                          "pipe": {
-                            "path": "/var/run/cilium/envoy/sockets/xds.sock"
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            "typedExtensionProtocolOptions": {
-              "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
-                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
-                "explicitHttpConfig": {
-                  "http2ProtocolOptions": {}
-                }
-              }
-            }
-          },
-          {
-            "name": "/envoy-admin",
-            "type": "STATIC",
-            "connectTimeout": "2s",
-            "loadAssignment": {
-              "clusterName": "/envoy-admin",
-              "endpoints": [
-                {
-                  "lbEndpoints": [
-                    {
-                      "endpoint": {
-                        "address": {
-                          "pipe": {
-                            "path": "/var/run/cilium/envoy/sockets/admin.sock"
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          }
-        ]
-      },
-      "dynamicResources": {
-        "ldsConfig": {
-          "initialFetchTimeout": "30s",
-          "apiConfigSource": {
-            "apiType": "GRPC",
-            "transportApiVersion": "V3",
-            "grpcServices": [
-              {
-                "envoyGrpc": {
-                  "clusterName": "xds-grpc-cilium"
-                }
-              }
-            ],
-            "setNodeOnFirstMessageOnly": true
-          },
-          "resourceApiVersion": "V3"
-        },
-        "cdsConfig": {
-          "initialFetchTimeout": "30s",
-          "apiConfigSource": {
-            "apiType": "GRPC",
-            "transportApiVersion": "V3",
-            "grpcServices": [
-              {
-                "envoyGrpc": {
-                  "clusterName": "xds-grpc-cilium"
-                }
-              }
-            ],
-            "setNodeOnFirstMessageOnly": true
-          },
-          "resourceApiVersion": "V3"
-        }
-      },
-      "bootstrapExtensions": [
-        {
-          "name": "envoy.bootstrap.internal_listener",
-          "typed_config": {
-            "@type": "type.googleapis.com/envoy.extensions.bootstrap.internal_listener.v3.InternalListener"
-          }
-        }
-      ],
-      "overload_manager": {
-        "resource_monitors": [
-          {
-            "name": "envoy.resource_monitors.global_downstream_max_connections",
-            "typed_config": {
-              "@type": "type.googleapis.com/envoy.extensions.resource_monitors.downstream_connections.v3.DownstreamConnectionsConfig",
-              "max_active_downstream_connections": "50000"
-            }
-          }
-        ]
-      },
-      "admin": {
-        "address": {
-          "pipe": {
-            "path": "/var/run/cilium/envoy/sockets/admin.sock"
-          }
-        }
-      }
-    }
 ---
 # Source: cilium/templates/cilium-agent/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -1141,31 +810,6 @@ subjects:
   name: "cilium-operator"
   namespace: kube-system
 ---
-# Source: cilium/templates/cilium-envoy/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: cilium-envoy
-  namespace: kube-system
-  annotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/port: "9964"
-  labels:
-    k8s-app: cilium-envoy
-    app.kubernetes.io/name: cilium-envoy
-    app.kubernetes.io/part-of: cilium
-    io.cilium/app: proxy
-spec:
-  clusterIP: None
-  type: ClusterIP
-  selector:
-    k8s-app: cilium-envoy
-  ports:
-  - name: envoy-metrics
-    port: 9964
-    protocol: TCP
-    targetPort: envoy-metrics
----
 # Source: cilium/templates/hubble/peer-service.yaml
 apiVersion: v1
 kind: Service
@@ -1214,7 +858,7 @@ spec:
     spec:
       containers:
       - name: cilium-agent
-        image: "quay.io/cilium/cilium:v1.16.4@sha256:d55ec38938854133e06739b1af237932b9c4dd4e75e9b7b2ca3acc72540a44bf"
+        image: "quay.io/cilium/cilium:v1.16.5@sha256:758ca0793f5995bb938a2fa219dcce63dc0b3fa7fc4ce5cc851125281fb7361d"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-agent
@@ -1323,9 +967,6 @@ spec:
           privileged: true
         terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
-        - name: envoy-sockets
-          mountPath: /var/run/cilium/envoy/sockets
-          readOnly: false
         - name: bpf-maps
           mountPath: /sys/fs/bpf
           mountPropagation: Bidirectional
@@ -1346,7 +987,7 @@ spec:
           mountPath: /tmp
       initContainers:
       - name: config
-        image: "quay.io/cilium/cilium:v1.16.4@sha256:d55ec38938854133e06739b1af237932b9c4dd4e75e9b7b2ca3acc72540a44bf"
+        image: "quay.io/cilium/cilium:v1.16.5@sha256:758ca0793f5995bb938a2fa219dcce63dc0b3fa7fc4ce5cc851125281fb7361d"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-dbg
@@ -1373,7 +1014,7 @@ spec:
       # Required to mount cgroup2 filesystem on the underlying Kubernetes node.
       # We use nsenter command with host's cgroup and mount namespaces enabled.
       - name: mount-cgroup
-        image: "quay.io/cilium/cilium:v1.16.4@sha256:d55ec38938854133e06739b1af237932b9c4dd4e75e9b7b2ca3acc72540a44bf"
+        image: "quay.io/cilium/cilium:v1.16.5@sha256:758ca0793f5995bb938a2fa219dcce63dc0b3fa7fc4ce5cc851125281fb7361d"
         imagePullPolicy: IfNotPresent
         env:
         - name: CGROUP_ROOT
@@ -1401,7 +1042,7 @@ spec:
         securityContext:
           privileged: true
       - name: apply-sysctl-overwrites
-        image: "quay.io/cilium/cilium:v1.16.4@sha256:d55ec38938854133e06739b1af237932b9c4dd4e75e9b7b2ca3acc72540a44bf"
+        image: "quay.io/cilium/cilium:v1.16.5@sha256:758ca0793f5995bb938a2fa219dcce63dc0b3fa7fc4ce5cc851125281fb7361d"
         imagePullPolicy: IfNotPresent
         env:
         - name: BIN_PATH
@@ -1427,7 +1068,7 @@ spec:
         securityContext:
           privileged: true
       - name: clean-cilium-state
-        image: "quay.io/cilium/cilium:v1.16.4@sha256:d55ec38938854133e06739b1af237932b9c4dd4e75e9b7b2ca3acc72540a44bf"
+        image: "quay.io/cilium/cilium:v1.16.5@sha256:758ca0793f5995bb938a2fa219dcce63dc0b3fa7fc4ce5cc851125281fb7361d"
         imagePullPolicy: IfNotPresent
         command:
         - /init-container.sh
@@ -1468,7 +1109,7 @@ spec:
           mountPath: /var/run/cilium # wait-for-kube-proxy
       # Install the CNI binaries in an InitContainer so we don't have a writable host mount in the agent
       - name: install-cni-binaries
-        image: "quay.io/cilium/cilium:v1.16.4@sha256:d55ec38938854133e06739b1af237932b9c4dd4e75e9b7b2ca3acc72540a44bf"
+        image: "quay.io/cilium/cilium:v1.16.5@sha256:758ca0793f5995bb938a2fa219dcce63dc0b3fa7fc4ce5cc851125281fb7361d"
         imagePullPolicy: IfNotPresent
         command:
           - "/install-plugin.sh"
@@ -1545,11 +1186,6 @@ spec:
         hostPath:
           path: /run/xtables.lock
           type: FileOrCreate
-      # Sharing socket with Cilium Envoy on the same node by using a host path
-      - name: envoy-sockets
-        hostPath:
-          path: "/var/run/cilium/envoy/sockets"
-          type: DirectoryOrCreate
         # To read the clustermesh configuration
       - name: clustermesh-secrets
         projected:
@@ -1588,179 +1224,6 @@ spec:
               - key: ca.crt
                 path: local-etcd-client-ca.crt
 ---
-# Source: cilium/templates/cilium-envoy/daemonset.yaml
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: cilium-envoy
-  namespace: kube-system
-  labels:
-    k8s-app: cilium-envoy
-    app.kubernetes.io/part-of: cilium
-    app.kubernetes.io/name: cilium-envoy
-    name: cilium-envoy
-spec:
-  selector:
-    matchLabels:
-      k8s-app: cilium-envoy
-  updateStrategy:
-    rollingUpdate:
-      maxUnavailable: 2
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations:
-        # Set app AppArmor's profile to "unconfined". The value of this annotation
-        # can be modified as long users know which profiles they have available
-        # in AppArmor.
-        container.apparmor.security.beta.kubernetes.io/cilium-envoy: "unconfined"
-      labels:
-        k8s-app: cilium-envoy
-        name: cilium-envoy
-        app.kubernetes.io/name: cilium-envoy
-        app.kubernetes.io/part-of: cilium
-    spec:
-      containers:
-      - name: cilium-envoy
-        image: "quay.io/cilium/cilium-envoy:v1.30.7-1731393961-97edc2815e2c6a174d3d12e71731d54f5d32ea16@sha256:0287b36f70cfbdf54f894160082f4f94d1ee1fb10389f3a95baa6c8e448586ed"
-        imagePullPolicy: IfNotPresent
-        command:
-        - /usr/bin/cilium-envoy-starter
-        args:
-        - '--'
-        - '-c /var/run/cilium/envoy/bootstrap-config.json'
-        - '--base-id 0'
-        - '--log-level info'
-        - '--log-format [%Y-%m-%d %T.%e][%t][%l][%n] [%g:%#] %v'
-        startupProbe:
-          httpGet:
-            host: "127.0.0.1"
-            path: /healthz
-            port: 9878
-            scheme: HTTP
-          failureThreshold: 105
-          periodSeconds: 2
-          successThreshold: 1
-          initialDelaySeconds: 5
-        livenessProbe:
-          httpGet:
-            host: "127.0.0.1"
-            path: /healthz
-            port: 9878
-            scheme: HTTP
-          periodSeconds: 30
-          successThreshold: 1
-          failureThreshold: 10
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            host: "127.0.0.1"
-            path: /healthz
-            port: 9878
-            scheme: HTTP
-          periodSeconds: 30
-          successThreshold: 1
-          failureThreshold: 3
-          timeoutSeconds: 5
-        env:
-        - name: K8S_NODE_NAME
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: spec.nodeName
-        - name: CILIUM_K8S_NAMESPACE
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.namespace
-        - name: KUBERNETES_SERVICE_HOST
-          value: "10.0.2.2"
-        - name: KUBERNETES_SERVICE_PORT
-          value: "6443"
-        ports:
-        - name: envoy-metrics
-          containerPort: 9964
-          hostPort: 9964
-          protocol: TCP
-        securityContext:
-          seLinuxOptions:
-            level: s0
-            type: spc_t
-          capabilities:
-            add:
-              - NET_ADMIN
-              - SYS_ADMIN
-            drop:
-              - ALL
-        terminationMessagePolicy: FallbackToLogsOnError
-        volumeMounts:
-        - name: envoy-sockets
-          mountPath: /var/run/cilium/envoy/sockets
-          readOnly: false
-        - name: envoy-artifacts
-          mountPath: /var/run/cilium/envoy/artifacts
-          readOnly: true
-        - name: envoy-config
-          mountPath: /var/run/cilium/envoy/
-          readOnly: true
-        - name: bpf-maps
-          mountPath: /sys/fs/bpf
-          mountPropagation: HostToContainer
-      restartPolicy: Always
-      priorityClassName: system-node-critical
-      serviceAccountName: "cilium-envoy"
-      automountServiceAccountToken: true
-      terminationGracePeriodSeconds: 1
-      hostNetwork: true
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: cilium.io/no-schedule
-                operator: NotIn
-                values:
-                - "true"
-        podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchLabels:
-                k8s-app: cilium
-            topologyKey: kubernetes.io/hostname
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchLabels:
-                k8s-app: cilium-envoy
-            topologyKey: kubernetes.io/hostname
-      nodeSelector:
-        kubernetes.io/os: linux
-      tolerations:
-        - operator: Exists
-      volumes:
-      - name: envoy-sockets
-        hostPath:
-          path: "/var/run/cilium/envoy/sockets"
-          type: DirectoryOrCreate
-      - name: envoy-artifacts
-        hostPath:
-          path: "/var/run/cilium/envoy/artifacts"
-          type: DirectoryOrCreate
-      - name: envoy-config
-        configMap:
-          name: cilium-envoy-config
-          # note: the leading zero means this number is in octal representation: do not remove it
-          defaultMode: 0400
-          items:
-            - key: bootstrap-config.json
-              path: bootstrap-config.json
-        # To keep state between restarts / upgrades
-        # To keep state between restarts / upgrades for bpf maps
-      - name: bpf-maps
-        hostPath:
-          path: /sys/fs/bpf
-          type: DirectoryOrCreate
----
 # Source: cilium/templates/cilium-operator/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -1793,7 +1256,7 @@ spec:
     metadata:
       annotations:
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "ceb83b0405b269dead3aa4fb52a105248a9033e621e5d8138097207dc3023da4"
+        cilium.io/cilium-configmap-checksum: "de1e29d64ffa8426fd4f5f6d80e1a585304064854463a0e54c6a44381fe3ded2"
       labels:
         io.cilium/app: operator
         name: cilium-operator
@@ -1802,7 +1265,7 @@ spec:
     spec:
       containers:
       - name: cilium-operator
-        image: "quay.io/cilium/operator-generic:v1.16.4@sha256:c55a7cbe19fe0b6b28903a085334edb586a3201add9db56d2122c8485f7a51c5"
+        image: "quay.io/cilium/operator-generic:v1.16.5@sha256:f7884848483bbcd7b1e0ccfd34ba4546f258b460cb4b7e2f06a1bcc96ef88039"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-operator-generic
