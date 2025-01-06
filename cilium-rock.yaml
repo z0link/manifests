@@ -40,11 +40,11 @@ ipam:
 k8s:
   requireIPv4PodCIDR: true
 
-#loadBalancer:
-#  mode: dsr
-#enableIPv4Masquerade: true
-#ipv4NativeRoutingCIDR: 10.0.2.0/24
-#autoDirectNodeRoutes: false
+loadBalancer:
+  mode: dsr
+enableIPv4Masquerade: true
+ipv4NativeRoutingCIDR: 10.0.0.0/8
+autoDirectNodeRoutes: false
 
 bgpControlPlane:
   enabled: true

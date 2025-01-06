@@ -160,6 +160,7 @@ data:
   auto-direct-node-routes: "false"
   direct-routing-skip-unreachable: "false"
   enable-local-redirect-policy: "false"
+  ipv4-native-routing-cidr: 10.0.0.0/8
   enable-runtime-device-detection: "true"
 
   kube-proxy-replacement: "true"
@@ -171,6 +172,7 @@ data:
   enable-health-check-loadbalancer-ip: "false"
   node-port-bind-protection: "true"
   enable-auto-protect-node-port-range: "true"
+  bpf-lb-mode: "dsr"
   bpf-lb-acceleration: "disabled"
   enable-svc-source-range-check: "true"
   enable-l2-neigh-discovery: "false"
@@ -1256,7 +1258,7 @@ spec:
     metadata:
       annotations:
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "93ff35156419e29b48c237ba3318a6af49fecf7224b66fce06f06d62e520c2c7"
+        cilium.io/cilium-configmap-checksum: "dd39d3492878da4d3d89724eee065214300b2813621fda9d283e00450996e62b"
       labels:
         io.cilium/app: operator
         name: cilium-operator
