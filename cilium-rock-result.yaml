@@ -127,10 +127,10 @@ data:
   preallocate-bpf-maps: "false"
 
   # Name of the cluster. Only relevant when building a mesh of clusters.
-  cluster-name: default
+  cluster-name: everest
   # Unique ID of the cluster. Must be unique across all conneted clusters and
   # in the range of 1 and 255. Only relevant when building a mesh of clusters.
-  cluster-id: "0"
+  cluster-id: "2"
 
   # Encapsulation mode for communication between nodes
   # Possible values:
@@ -1256,7 +1256,7 @@ spec:
     metadata:
       annotations:
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "de1e29d64ffa8426fd4f5f6d80e1a585304064854463a0e54c6a44381fe3ded2"
+        cilium.io/cilium-configmap-checksum: "93ff35156419e29b48c237ba3318a6af49fecf7224b66fce06f06d62e520c2c7"
       labels:
         io.cilium/app: operator
         name: cilium-operator

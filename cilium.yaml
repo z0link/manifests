@@ -1,4 +1,7 @@
 ---
+cluster:
+  name: tipani
+  id: 1
 k8sServiceHost: "api.cluster.local"
 k8sServicePort: "6443"
 

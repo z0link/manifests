@@ -1,4 +1,7 @@
 ---
+cluster:
+  name: everest
+  id: 2
 k8sServiceHost: "10.0.2.2"
 k8sServicePort: "6443"
 
