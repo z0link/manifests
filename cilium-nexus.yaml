@@ -1,8 +1,8 @@
 ---
 cluster:
-  name: tipani
-  id: 1
-k8sServiceHost: "api.cluster.local"
+  name: nexus
+  id: 2
+k8sServiceHost: "nexus.zerolab.link"
 k8sServicePort: "6443"
 
 envoy:
@@ -14,23 +14,23 @@ clustermesh:
     enabled: true
     domain: mesh.zerolab.link
     clusters:
-    - name: everest
-      port: 32380
-      ips:
-      - 10.171.0.10
     - name: tipani
-      port: 32379
+      port: 2379
       ips:
       - 10.111.0.10
+    - name: everest
+      port: 2379
+      ips:
+      - 10.171.0.10
   apiserver:
     kvstoremesh:
       enabled: false
     service:
       type: LoadBalancer
-      loadBalancerIP: 10.111.0.10
-      nodePort: 32379
+      loadBalancerIP: 10.181.0.10
+      nodePort: NULL
   tls:
-    authMode: cluster
+    authMode: legacy
     enableSecrets: true
 
 hubble:

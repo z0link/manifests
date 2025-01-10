@@ -6,16 +6,38 @@ k8sServiceHost: "10.0.2.2"
 k8sServicePort: "6443"
 
 envoy:
-  enabled: false
+  enabled: true
 
 clustermesh:
   useAPIServer: true
+  config:
+    enabled: true
+    domain: mesh.zerolab.link
+    clusters:
+    - name: everest
+      port: 32380
+      ips:
+      - 10.171.0.10
+    - name: tipani
+      port: 32379
+      ips:
+      - 10.111.0.10
+  apiserver:
+    kvstoremesh:
+      enabled: false
+    service:
+      type: LoadBalancer
+      loadBalancerIP: 10.171.0.10
+      nodePort: 32380
+  tls:
+    authMode: cluster
+    enableSecrets: true
 
 hubble:
   ui:
     enabled: false
   relay:
-    enabled: false
+    enabled: true
   tls:
     enabled: false
 
@@ -35,6 +57,7 @@ operator:
       effect: NoSchedule
 
 kubeProxyReplacement: true
+routingMode: native
 healthChecking: true
 cni:
   install: true
