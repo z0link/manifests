@@ -243,7 +243,7 @@ data:
   #   - disabled
   #   - vxlan (default)
   #   - geneve
-
+  tunnel: disabled
   routing-mode: "native"
   tunnel-protocol: "vxlan"
   service-no-backend-response: "reject"
@@ -258,11 +258,11 @@ data:
   enable-ipv6-masquerade: "true"
   enable-tcx: "true"
   datapath-mode: "veth"
-  enable-masquerade-to-route-source: "true"
+  enable-masquerade-to-route-source: "false"
   enable-wireguard: "true"
   wireguard-persistent-keepalive: "0s"
-  encrypt-node: "true"
-  enable-encryption-strict-mode: "true"
+  encrypt-node: "false"
+  enable-encryption-strict-mode: "false"
 
   encryption-strict-mode-cidr: "10.122.0.0/16"
 
@@ -274,7 +274,7 @@ data:
 
   auto-direct-node-routes: "true"
   direct-routing-skip-unreachable: "true"
-  enable-local-redirect-policy: "false"
+  enable-local-redirect-policy: "true"
   ipv4-native-routing-cidr: 10.0.0.0/8
   ipv6-native-routing-cidr: ::/0
   enable-runtime-device-detection: "true"
