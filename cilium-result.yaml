@@ -252,10 +252,10 @@ data:
   # Enables L7 proxy for L7 policy enforcement and visibility
   enable-l7-proxy: "true"
 
-  enable-ipv4-masquerade: "true"
+  enable-ipv4-masquerade: "false"
   enable-ipv4-big-tcp: "false"
   enable-ipv6-big-tcp: "false"
-  enable-ipv6-masquerade: "true"
+  enable-ipv6-masquerade: "false"
   enable-tcx: "true"
   datapath-mode: "veth"
   enable-masquerade-to-route-source: "false"
@@ -272,10 +272,10 @@ data:
   install-no-conntrack-iptables-rules: "false"
   iptables-random-fully: "false"
 
-  auto-direct-node-routes: "true"
-  direct-routing-skip-unreachable: "true"
+  auto-direct-node-routes: "false"
+  direct-routing-skip-unreachable: "false"
   enable-local-redirect-policy: "true"
-  ipv4-native-routing-cidr: 10.0.0.0/8
+  ipv4-native-routing-cidr: 0.0.0.0/0
   ipv6-native-routing-cidr: ::/0
   enable-runtime-device-detection: "true"
 
