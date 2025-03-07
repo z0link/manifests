@@ -158,7 +158,7 @@ data:
   #   - vxlan (default)
   #   - geneve
 
-  routing-mode: "native"
+  routing-mode: "tunnel"
   tunnel-protocol: "vxlan"
   service-no-backend-response: "reject"
 
@@ -178,11 +178,9 @@ data:
   install-no-conntrack-iptables-rules: "false"
   iptables-random-fully: "false"
 
-  auto-direct-node-routes: "true"
-  direct-routing-skip-unreachable: "true"
+  auto-direct-node-routes: "false"
+  direct-routing-skip-unreachable: "false"
   enable-local-redirect-policy: "false"
-  ipv4-native-routing-cidr: 10.110.3.0/24
-  ipv6-native-routing-cidr: ::/0
   enable-runtime-device-detection: "true"
 
   kube-proxy-replacement: "true"
@@ -193,13 +191,12 @@ data:
   enable-health-check-loadbalancer-ip: "false"
   node-port-bind-protection: "true"
   enable-auto-protect-node-port-range: "true"
-  bpf-lb-mode: "dsr"
   bpf-lb-acceleration: "disabled"
   enable-experimental-lb: "false"
   enable-svc-source-range-check: "true"
   enable-l2-neigh-discovery: "true"
   arping-refresh-period: "30s"
-  k8s-require-ipv4-pod-cidr: "true"
+  k8s-require-ipv4-pod-cidr: "false"
   k8s-require-ipv6-pod-cidr: "false"
   enable-k8s-networkpolicy: "true"
   enable-endpoint-lockdown-on-policy-overflow: "false"
@@ -207,7 +204,6 @@ data:
   write-cni-conf-when-ready: /host/etc/cni/net.d/05-cilium.conflist
   cni-exclusive: "true"
   cni-log-file: "/var/run/cilium/cilium-cni.log"
-  enable-route-mtu-for-cni-chaining: "true"
   enable-endpoint-health-checking: "true"
   enable-health-checking: "true"
   health-check-icmp-failure-threshold: "3"
@@ -224,9 +220,11 @@ data:
   # An additional address for Hubble server to listen to (e.g. ":4244").
   hubble-listen-address: ":4244"
   hubble-disable-tls: "true"
-  ipam: "kubernetes"
+  ipam: "cluster-pool"
   ipam-multi-pool-pre-allocation: 
   ipam-cilium-node-update-rate: "15s"
+  cluster-pool-ipv4-cidr: "10.0.0.0/8"
+  cluster-pool-ipv4-mask-size: "24"
 
   default-lb-service-ipam: "lbipam"
   egress-gateway-reconciliation-trigger-interval: "1s"
@@ -1620,7 +1618,7 @@ spec:
     metadata:
       annotations:
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "9b026f394fd044bee9344472bb89da34a527379559ed10c0fc0efdf959f97c2b"
+        cilium.io/cilium-configmap-checksum: "32b3d691906faa3228857e9454c370331eff116d363345283b63104a5fb8f7f1"
       labels:
         io.cilium/app: operator
         name: cilium-operator
