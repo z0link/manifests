@@ -181,7 +181,7 @@ data:
   auto-direct-node-routes: "true"
   direct-routing-skip-unreachable: "true"
   enable-local-redirect-policy: "false"
-  ipv4-native-routing-cidr: 10.0.0.0/8
+  ipv4-native-routing-cidr: 10.110.3.0/24
   ipv6-native-routing-cidr: ::/0
   enable-runtime-device-detection: "true"
 
@@ -1620,7 +1620,7 @@ spec:
     metadata:
       annotations:
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "d1ca4805ab15d820776f8524fc6f480ad7d62b3ec01de3519a0d5c5136e13ea5"
+        cilium.io/cilium-configmap-checksum: "9b026f394fd044bee9344472bb89da34a527379559ed10c0fc0efdf959f97c2b"
       labels:
         io.cilium/app: operator
         name: cilium-operator
