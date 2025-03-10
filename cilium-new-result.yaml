@@ -220,11 +220,9 @@ data:
   # An additional address for Hubble server to listen to (e.g. ":4244").
   hubble-listen-address: ":4244"
   hubble-disable-tls: "true"
-  ipam: "cluster-pool"
+  ipam: "kubernetes"
   ipam-multi-pool-pre-allocation: 
   ipam-cilium-node-update-rate: "15s"
-  cluster-pool-ipv4-cidr: "10.0.0.0/8"
-  cluster-pool-ipv4-mask-size: "24"
 
   default-lb-service-ipam: "lbipam"
   egress-gateway-reconciliation-trigger-interval: "1s"
@@ -1618,7 +1616,7 @@ spec:
     metadata:
       annotations:
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "32b3d691906faa3228857e9454c370331eff116d363345283b63104a5fb8f7f1"
+        cilium.io/cilium-configmap-checksum: "e182ccdac76b6c39b50390a967116635c64eeeac1ae9c151dc4830ef7ed610f1"
       labels:
         io.cilium/app: operator
         name: cilium-operator
