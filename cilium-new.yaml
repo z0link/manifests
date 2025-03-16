@@ -32,11 +32,11 @@ operator:
 kubeProxyReplacement: true
 #routingMode: native
 #healthChecking: true
-#cni:
-#  install: true
+cni:
+  install: true
 #  enableRouteMTUForCNIChaining: true
-#ipam:
-#  mode: "kubernetes"
+ipam:
+  mode: "kubernetes"
 #k8s:
 #  requireIPv4PodCIDR: true
 #
@@ -52,13 +52,15 @@ bgpControlPlane:
   enabled: true
 
 bpf:
-  lbExternalClusterIP: true
+  lbExternalClusterIP: false
 ipv4:
   enabled: true
 ipv6:
   enabled: false
 hostServices:
   enabled: true
+hostFirewall:
+  enabled: false
 hostPort:
   enabled: true
 nodePort:
