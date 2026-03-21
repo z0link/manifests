@@ -40,6 +40,9 @@ cni:
 ipam:
   mode: "kubernetes"
 
+nodeIPAM:
+  enabled: true
+
 bgpControlPlane:
   enabled: true
 
